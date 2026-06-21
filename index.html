@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Goldenbet — Multi-Sport Sportsbook</title>
+<meta name="description" content="Goldenbet — live odds across football, basketball, tennis and more." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ AGE / JURISDICTION GATE ============ -->
+<div id="ageGate" class="overlay">
+  <div class="modal age-modal">
+    <div class="coin-mark big" aria-hidden="true">
+      <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" class="coin-face"/><circle cx="24" cy="24" r="21" class="coin-ring"/><text x="24" y="31" class="coin-g">G</text></svg>
+    </div>
+    <h1 class="brand-name big">GOLDEN<span class="brand-accent">BET</span></h1>
+    <p class="age-copy">You must be of legal gambling age in your jurisdiction, and betting must be legal where you are located, to enter this site.</p>
+    <div class="age-actions">
+      <button id="ageConfirm" class="btn btn-gold btn-lg">I confirm I'm of legal age — Enter site</button>
+      <a href="https://www.begambleaware.org" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">I do not meet this — Exit</a>
+    </div>
+    <p class="fine-print">Gambling can be addictive. Please play responsibly. This is a front-end demo template — see footer for details.</p>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div id="toastRoot" class="toast-root" aria-live="polite"></div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app" class="app hidden">
+
+  <header class="header">
+    <div class="header-row">
+      <button id="menuBtn" class="icon-btn only-mobile" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+
+      <div class="brand">
+        <span class="coin-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" class="coin-face"/><circle cx="24" cy="24" r="21" class="coin-ring"/><text x="24" y="31" class="coin-g">G</text></svg>
+        </span>
+        <span class="brand-name">GOLDEN<span class="brand-accent">BET</span></span>
+      </div>
+
+      <nav id="sportNav" class="sport-nav" aria-label="Sports"></nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="searchBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <button class="icon-btn" id="notifBtn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="icon-btn only-desktop" id="betsNavBtn" aria-label="My bets">
+          <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/></svg>
+        </button>
+        <button class="balance-pill" id="walletBtn">
+          <svg viewBox="0 0 24 24" class="coin-icon"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2 3-2s3 .8 3 2-1.3 1.8-3 2-3 .9-3 2.2 1.3 2.3 3 2.3 3-.7 3-2.1"/></svg>
+          <span id="balanceAmt">$0.00</span>
+        </button>
+        <button class="icon-btn only-desktop" id="acctBtn" aria-label="Account">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-row hidden" id="searchRow">
+      <input id="searchInput" type="text" placeholder="Search teams, leagues, matches…" autocomplete="off" />
+      <button id="searchClose" class="icon-btn" aria-label="Close search">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="ticker-wrap" id="tickerWrap">
+    <div class="ticker" id="ticker"></div>
+    <div class="ticker" id="tickerDup" aria-hidden="true"></div>
+  </div>
+
+  <main class="main">
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <h3>Favourites</h3>
+        <ul id="favList" class="league-list empty-ok"></ul>
+      </div>
+      <div class="sidebar-section">
+        <h3 id="leagueHeading">Leagues</h3>
+        <ul id="leagueList" class="league-list"></ul>
+      </div>
+      <div class="sidebar-section responsible-card">
+        <h3>Play responsibly</h3>
+        <p>Set limits any time from <strong>Account → Responsible play</strong>.</p>
+        <a href="#" data-view="account" class="link-arrow">Manage limits →</a>
+      </div>
+    </aside>
+
+    <section class="content">
+
+      <div id="view-sportsbook" class="view">
+        <div class="promo-strip" id="promoStrip"></div>
+        <div class="content-header">
+          <div>
+            <h2 id="contentTitle">Football</h2>
+            <p class="content-sub" id="contentSub">All times shown in your local timezone</p>
+          </div>
+          <div class="filter-chips" id="filterChips"></div>
+        </div>
+        <div id="matchList" class="match-list"></div>
+      </div>
+
+      <div id="view-live" class="view hidden">
+        <div class="content-header">
+          <div><h2><span class="live-dot"></span> Live now</h2><p class="content-sub">In-play matches across all sports</p></div>
+        </div>
+        <div id="liveList" class="match-list"></div>
+      </div>
+
+      <div id="view-bets" class="view hidden">
+        <div class="content-header"><div><h2>My bets</h2><p class="content-sub">Track open and settled wagers</p></div></div>
+        <div class="tabbar" id="betsTabs">
+          <button class="tab-btn active" data-tab="open">Open</button>
+          <button class="tab-btn" data-tab="settled">Settled</button>
+        </div>
+        <div id="betsList" class="bets-list"></div>
+      </div>
+
+      <div id="view-wallet" class="view hidden">
+        <div class="content-header"><div><h2>Wallet</h2><p class="content-sub">Demo balance — connect a licensed payment processor to go live</p></div></div>
+        <div class="wallet-card">
+          <span class="wallet-label">Available balance</span>
+          <strong id="walletBalance">$0.00</strong>
+          <div class="wallet-actions">
+            <button class="btn btn-gold" id="depositBtn">Deposit</button>
+            <button class="btn btn-ghost" id="withdrawBtn">Withdraw</button>
+          </div>
+        </div>
+        <h3 class="section-label">Transaction history</h3>
+        <div id="txList" class="tx-list"></div>
+      </div>
+
+      <div id="view-account" class="view hidden">
+        <div class="content-header"><div><h2>Account</h2></div></div>
+
+        <div class="acct-card">
+          <div class="acct-row"><span>Display name</span><strong>Demo Player</strong></div>
+          <div class="acct-row"><span>Verification (KYC)</span><span class="badge-pill badge-warn">Not connected</span></div>
+          <div class="acct-row"><span>Currency</span><strong>USD (demo)</strong></div>
+        </div>
+
+        <h3 class="section-label">Responsible play</h3>
+        <div class="acct-card">
+          <div class="acct-row">
+            <span>Deposit limit (weekly)</span>
+            <input type="range" id="limitSlider" min="0" max="2000" step="50" value="500" />
+            <strong id="limitValue">$500</strong>
+          </div>
+          <div class="acct-row"><span>Reality check reminders</span>
+            <label class="switch"><input type="checkbox" id="realityToggle" checked /><span class="slider-track"></span></label>
+          </div>
+          <div class="acct-row">
+            <span>Take a break</span>
+            <div class="acct-buttons">
+              <button class="btn btn-ghost btn-sm" data-cooloff="1">24h cool-off</button>
+              <button class="btn btn-ghost btn-sm" data-cooloff="7">7-day cool-off</button>
+              <button class="btn btn-danger btn-sm" id="selfExcludeBtn">Self-exclude</button>
+            </div>
+          </div>
+          <p class="fine-print">Need support? Replace this with your local licensed problem-gambling helpline before launch.</p>
+        </div>
+
+        <button class="btn btn-ghost btn-lg full" id="logoutBtn">Log out</button>
+      </div>
+
+    </section>
+
+    <!-- Bet slip: side panel on desktop, bottom sheet on mobile -->
+    <aside class="betslip hidden" id="betslip">
+      <div class="betslip-header">
+        <h3>Bet slip <span id="slipCountInline" class="badge hidden">0</span></h3>
+        <div class="slip-mode" id="slipMode">
+          <button class="mode-btn active" data-mode="single">Singles</button>
+          <button class="mode-btn" data-mode="parlay" id="parlayModeBtn" disabled>Parlay</button>
+        </div>
+        <button class="icon-btn only-mobile" id="betslipClose" aria-label="Close bet slip">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="betslip-body" id="betslipBody">
+        <div class="slip-empty" id="slipEmpty">
+          <svg viewBox="0 0 24 24" width="40" height="40"><path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 000-4V7z"/><path d="M12 5v14" stroke-dasharray="2 3"/></svg>
+          <p>Tap any odds to add it here</p>
+        </div>
+        <div id="slipItems"></div>
+      </div>
+      <div class="betslip-footer hidden" id="betslipFooter">
+        <div class="slip-stake-row" id="parlayStakeRow">
+          <label>Combo stake</label>
+          <div class="stake-input"><span>$</span><input type="number" id="parlayStake" min="0" step="1" value="10" /></div>
+        </div>
+        <div class="slip-summary">
+          <div><span>Combined odds</span><strong id="comboOdds">—</strong></div>
+          <div><span>Potential payout</span><strong id="potentialPayout" class="gold-num">$0.00</strong></div>
+        </div>
+        <button class="btn btn-gold btn-lg full" id="placeBetBtn">Place bet</button>
+        <p class="fine-print center">Demo mode — no real funds move. Wire up your bet-placement API to go live.</p>
+      </div>
+    </aside>
+  </main>
+
+  <button class="betslip-fab only-mobile hidden" id="betslipFab" aria-label="Open bet slip">
+    <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a2 2 0 000-4V7z"/></svg>
+    <span id="slipCountFab" class="badge hidden">0</span>
+  </button>
+
+  <nav class="bottom-nav only-mobile" id="bottomNav">
+    <button class="bn-btn active" data-view="sportsbook">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Home</span>
+    </button>
+    <button class="bn-btn" data-view="live">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M5 12a7 7 0 0114 0M2 12a10 10 0 0120 0"/></svg><span>Live</span>
+    </button>
+    <button class="bn-btn" data-view="bets">
+      <svg viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/></svg><span>Bets</span>
+    </button>
+    <button class="bn-btn" data-view="wallet">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg><span>Wallet</span>
+    </button>
+    <button class="bn-btn" data-view="account">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Account</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ============ DEPOSIT MODAL ============ -->
+<div class="overlay hidden" id="depositOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>Deposit (demo)</h3><button class="icon-btn" data-close-overlay><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="fine-print">This panel is a placeholder. Connect a licensed payment processor (card, bank transfer, e-wallet) here.</p>
+    <div class="quick-amounts">
+      <button class="chip" data-amt="20">$20</button>
+      <button class="chip" data-amt="50">$50</button>
+      <button class="chip" data-amt="100">$100</button>
+      <button class="chip" data-amt="250">$250</button>
+    </div>
+    <div class="stake-input full"><span>$</span><input type="number" id="depositAmt" min="1" value="50" /></div>
+    <button class="btn btn-gold btn-lg full" id="depositConfirm">Add demo funds</button>
+  </div>
+</div>
+
+<!-- ============ LOGIN MODAL ============ -->
+<div class="overlay hidden" id="loginOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>Log in</h3><button class="icon-btn" data-close-overlay><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="fine-print">Demo only — hook this up to your real authentication provider.</p>
+    <label class="field-label">Email</label>
+    <input class="text-input" type="email" placeholder="you@email.com" />
+    <label class="field-label">Password</label>
+    <input class="text-input" type="password" placeholder="••••••••" />
+    <button class="btn btn-gold btn-lg full" id="loginConfirm">Log in</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p><strong>Demo build.</strong> Goldenbet's UI is wired to mock data only — no real wagers, payments, or accounts exist. Before launch you must integrate a licensed odds/data feed, KYC/age-verification provider, regulated payment processor, and your gambling license details, and implement jurisdiction-based geo-blocking.</p>
+  <p>18+ (or the legal age in your region). Gambling can be addictive — please play responsibly and set deposit limits. Replace this line with your local licensed problem-gambling helpline.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
